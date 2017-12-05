@@ -29,17 +29,27 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
-namespace BWofter.Converters.Expressions
+namespace BWofter.Converters.Extensions
 {
-    using System.Linq.Expressions;
-    public sealed class ExpressionReducer : ExpressionVisitor
+    using System;
+    using System.Collections.Generic;
+    using System.Data;
+    /// <summary><para>A static class that provides LINQ extensions for <see cref="IDictionary{TKey, TValue}"/> of <see cref="string"/> keys and <see cref="object"/> values.</para></summary>
+    public static class DictionaryStringObjectExtensions
     {
-        public override Expression Visit(Expression node)
+        /// <summary><para>Returns a <see cref="DataTable"/> that represents the columns and types of <paramref name="dictionary"/>. This does not copy the values.</para></summary>
+        /// <param name="dictionary"><para>The target of the extension method.</para></param>
+        /// <returns><para><see cref="DataTable"/> with columns that match the key and type of the <paramref name="dictionary"/> entries.</para></returns>
+        public static DataTable AsDataTableDefinition(this IDictionary<string, object> dictionary)
         {
-            if (node != null && !node.NodeType.HasFlag(ExpressionType.MemberInit))
-                while (node.CanReduce)
-                    node = node.Reduce();
-            return base.Visit(node);
+            if (dictionary == null) throw new ArgumentNullException(nameof(dictionary));
+            DataTable dataTable = new DataTable();
+            //Iterate over the entries in the dictionary and add a matching column to the new data table.
+            foreach (KeyValuePair<string, object> keyValuePair in dictionary)
+            {
+                dataTable.Columns.Add(keyValuePair.Key, keyValuePair.Value?.GetType() ?? typeof(object));
+            }
+            return dataTable;
         }
     }
 }
