@@ -6,7 +6,6 @@
     using System.Collections.Generic;
     using System.Data;
     using System.Linq;
-
     [TestClass]
     public sealed class ErrorTest
     {
